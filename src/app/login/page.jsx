@@ -18,7 +18,7 @@ export default function LoginPage() {
       
       console.log("Login successful", response.data);
 
-      router.push("/");
+      router.replace("/");
     
     } catch (error) {
       console.log("Login failed", error.message);
