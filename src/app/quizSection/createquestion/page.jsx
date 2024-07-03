@@ -13,7 +13,7 @@ const QuestionTypes = {
 const CreateQuestions = () => {
   const router = useRouter();
   const urlParams = new URLSearchParams(window.location.search);
-  const quizIdFromUrl = urlParams.get('quizId');
+  const quizId = urlParams.get('quizId');
   const [questions, setQuestions] = useState([]);
   const [initialQuestions, setInitialQuestions] = useState([]);
   const [isGradingEnabled, setIsGradingEnabled] = useState(false);
