@@ -12,23 +12,28 @@ const QuestionTypes = {
 
 const CreateQuestions = () => {
   const router = useRouter();
-  const urlParams = new URLSearchParams(window.location.search);
-  const quizId = urlParams.get('quizId');
+  const [quizId, setQuizId] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [initialQuestions, setInitialQuestions] = useState([]);
   const [isGradingEnabled, setIsGradingEnabled] = useState(false);
   const [checkingType, setCheckingType] = useState('');
 
   useEffect(() => {
-    if (!quizId) {
-      router.push('/quizSection/createQuiz');
-    } else {
-      fetchQuizDetails();
-      fetchQuestions();
-    }
-  }, [quizId, router]);
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const quizIdFromUrl = urlParams.get('quizId');
+      setQuizId(quizIdFromUrl);
 
-  const fetchQuizDetails = async () => {
+      if (!quizIdFromUrl) {
+        router.push('/quizSection/createQuiz');
+      } else {
+        fetchQuizDetails(quizIdFromUrl);
+        fetchQuestions(quizIdFromUrl);
+      }
+    }
+  }, [router]);
+
+  const fetchQuizDetails = async (quizId) => {
     try {
       const response = await axios.get(`/api/quiz/getquiz?quizId=${quizId}`);
       setIsGradingEnabled(response.data.quiz.isGradingEnabled);
@@ -39,7 +44,7 @@ const CreateQuestions = () => {
     }
   };
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = async (quizId) => {
     try {
       const response = await axios.get(`/api/quiz/getquiz?quizId=${quizId}`);
       console.log(response.data.quiz.questions);
@@ -255,4 +260,3 @@ const CreateQuestions = () => {
               };
               
               export default CreateQuestions;
-              
