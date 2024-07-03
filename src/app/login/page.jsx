@@ -345,7 +345,7 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-            <form action="#" method="POST" className="space-y-4">
+            <form  method="POST" className="space-y-4">
               <div>
                 <label
                   htmlfor="username"
