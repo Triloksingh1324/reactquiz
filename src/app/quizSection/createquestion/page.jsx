@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 const QuestionTypes = {
@@ -12,8 +12,8 @@ const QuestionTypes = {
 
 const CreateQuestions = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const quizId = searchParams.get('quizId');
+  const urlParams = new URLSearchParams(window.location.search);
+  const quizIdFromUrl = urlParams.get('quizId');
   const [questions, setQuestions] = useState([]);
   const [initialQuestions, setInitialQuestions] = useState([]);
   const [isGradingEnabled, setIsGradingEnabled] = useState(false);
