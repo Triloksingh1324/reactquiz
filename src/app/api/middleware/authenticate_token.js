@@ -1,38 +1,42 @@
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers'
 import User from '../../../models/UserModel';
 
 export const authenticateToken = async (req) => {
   try {
-    const cookies = req.cookies;
-    const token = cookies.accessToken;
-    const refreshToken = cookies.refreshToken;
+    const cookieStore = cookies()
+  
+    console.log("Using cookieStore",cookieStore.get('accessToken'));
 
+    const token = cookieStore.get('accessToken');
+    const refreshToken = cookieStore.get('refreshToken')
+     console.log("token",token);
     if (!token) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      return { success: false, error: 'Unauthorized' };
     }
 
-    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, decoded) => {
+    return jwt.verify(token.value, process.env.Access_TOKEN_SECRET, async (err, decoded) => {
       if (err) {
         if (err.name === 'TokenExpiredError') {
           if (!refreshToken) {
-            return NextResponse.json({ success: false, error: "Error" }, { status: 403 });
+            return { success: false, error: 'Unauthorized' };
           }
 
           try {
-            const user = await User.findOne({ refreshToken });
+            const user = await User.findOne({ refreshToken:refreshToken.value });
             if (!user) {
-              return NextResponse.json({ success: false, error: 'Error' }, { status: 403 });
+              return { success: false, error: 'Unauthorized' };
             }
 
-            return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err) => {
+            return jwt.verify(refreshToken.value, process.env.Refresh_TOKEN_SECRET, (err) => {
               if (err) {
-                return NextResponse.json({ success: false, error: 'Error' }, { status: 403 });
+                return { success: false, error: 'Unauthorized' };
               }
 
               const newAccessToken = jwt.sign(
                 { id: user._id, username: user.username, email: user.email },
-                process.env.ACCESS_TOKEN_SECRET,
+                process.env.Access_TOKEN_SECRET,
                 { expiresIn: '15m' }
               );
 
@@ -45,31 +49,31 @@ export const authenticateToken = async (req) => {
                 sameSite: 'strict'
               });
 
-              request.user = user;
-              return response;
+              req.user = user;
+              return { success: true, user };
             });
           } catch (error) {
             console.error(error.message);
-            return NextResponse.json({ success: false, error: 'Error' }, { status: 500 });
+            return { success: false, error: 'Server Error' };
           }
         } else {
-          return NextResponse.json({ success: false, error: 'Error' }, { status: 403 });
+          return { success: false, error: 'Unauthorized' };
         }
       } else {
         try {
           const user = await User.findOne({ _id: decoded.id });
-          if (!user) return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+          if (!user) return { success: false, error: 'User not found' };
 
-          request.user = user;
-          return NextResponse.next();
+          req.user = user;
+          return { success: true, user };
         } catch (error) {
           console.error(error.message);
-          return NextResponse.json({ success: false, error: 'Server Error' }, { status: 500 });
+          return { success: false, error: 'Server Error' };
         }
       }
     });
   } catch (error) {
     console.error(error.message);
-    return NextResponse.json({ success: false, error: 'Server Error' }, { status: 500 });
+    return { success: false, error: 'Server Error' };
   }
 };

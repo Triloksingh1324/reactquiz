@@ -2,36 +2,42 @@ import { connect } from '../../../../dbconfig';
 import QuizCreator from '../../../../models/Quizcreator';
 import { authenticateToken } from '../../middleware/authenticate_token';
 import User from '../../../../models/UserModel';
-import jwt from 'jsonwebtoken';
+import cookie from 'cookie';
 
 connect();
 
 export async function POST(req, res) {
   try {
     const isAuthenticated = await authenticateToken(req);
-    if (!isAuthenticated) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    if (!isAuthenticated.success) {
+      return new Response(
+        JSON.stringify({ success: false, error: isAuthenticated.error }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
     }
 
-    const token = req.headers.cookie.split('accessToken=')[1].split(';')[0];
-    const decoded = jwt.verify(token, process.env.Access_TOKEN_SECRET);
-    const { title, checkingType, gradingEnabled, isTimed, timeframe } = await req.json();
-
-
+    const { user } = isAuthenticated;
+    const { title, checkingType, gradingEnabled, isTimed, startTime, endTime } = await req.json();
 
     const newQuiz = new QuizCreator({
       title,
       checkingType,
       grades: gradingEnabled,
       isTimed,
-      timeframe,
-      creatorId: decoded.id,
+      startTime,
+      endTime,
+      creatorId: user._id,
       questions: []
     });
 
     await newQuiz.save();
     const userToUpdate = await User.findByIdAndUpdate(
-      decoded.id,
+      user._id,
       { $push: { quizzesCreated: newQuiz._id } },
       { new: true }
     );
@@ -56,9 +62,6 @@ export async function POST(req, res) {
       JSON.stringify({ success: false, error: error.message }),
       {
         status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
       }
     );
   }

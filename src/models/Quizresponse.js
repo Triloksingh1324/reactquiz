@@ -20,6 +20,9 @@ const ResponseSchema = new mongoose.Schema({
       correctAnswer: { type: String},
       timeTaken: { type: String},
       score: { type: Number, default: 0 },
+      suggestion: {
+        type: String,
+      }
     },
   ],
   totalScore: { type: Number, default: 0 },

@@ -11,7 +11,8 @@ const CreateQuiz = () => {
   const [checkingType, setCheckingType] = useState('');
   const [gradingEnabled, setGradingEnabled] = useState(false);
   const [isTimed, setIsTimed] = useState(false);
-  const [timeframe, setTimeframe] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [questionCreationMethod, setQuestionCreationMethod] = useState('');
 
   const handleSubmit = async (e) => {
@@ -22,7 +23,8 @@ const CreateQuiz = () => {
         checkingType,
         gradingEnabled,
         isTimed,
-        timeframe,
+        startTime,
+        endTime,
       });
       const { quizId } = response.data;
       router.push(`/quizSection/createquestion?quizId=${quizId}`);
@@ -35,7 +37,7 @@ const CreateQuiz = () => {
     <>
       <Navbar />
       <div className="min-h-screen bg-gradient-to-tr from-red-300 to-yellow-200 flex flex-col items-center py-10">
-        <h1 className="text-4xl font-bold text-center text-indigo-600 mb-6"> Get Started</h1>
+        <h1 className="text-4xl font-bold text-center text-indigo-600 mb-6">Get Started</h1>
         <div className="w-full max-w-lg space-y-6">
           <h2 className="text-2xl font-bold mb-4 text-center">Before we get started</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -68,17 +70,31 @@ const CreateQuiz = () => {
                   onChange={(e) => setIsTimed(e.target.checked)}
                   className="mr-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
-                Include timeframe?
+                Include start and end time?
               </label>
               {isTimed && (
-                <input
-                  type="text"
-                  value={timeframe}
-                  onChange={(e) => setTimeframe(e.target.value)}
-                  className="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                  placeholder="Enter Timeframe"
-                  required
-                />
+                <div className="mt-2 space-y-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Start Time:</label>
+                    <input
+                      type="datetime-local"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">End Time:</label>
+                    <input
+                      type="datetime-local"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                      required
+                    />
+                  </div>
+                </div>
               )}
             </div>
             <div className="space-y-4">

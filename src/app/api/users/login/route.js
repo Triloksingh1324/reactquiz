@@ -1,4 +1,4 @@
-'use server'
+
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -6,7 +6,7 @@ import { connect } from '../../../../dbconfig'
 import User from '../../../../models/UserModel'
 
 connect()
-
+export const dynamic = 'force-dynamic'
 export async function POST(request) {
     try {
         const reqbody = await request.json();
@@ -39,11 +39,10 @@ export async function POST(request) {
         response.cookies.set({
             name:"accessToken",
             value: accessToken,
-            httpOnly: true,
             maxAge: 24 * 60 * 60*2,
         });
         response.cookies.set('refreshToken', refreshToken, { path: '/', maxAge: 7 * 24 * 60 * 60 });
-
+        
         await user.save();
         return response;
 

@@ -36,7 +36,7 @@ const CreateQuestions = () => {
   const fetchQuizDetails = async (quizId) => {
     try {
       const response = await axios.get(`/api/quiz/getquiz?quizId=${quizId}`);
-      setIsGradingEnabled(response.data.quiz.isGradingEnabled);
+      setIsGradingEnabled(response.data.quiz.grades);
       setCheckingType(response.data.quiz.checkingType);
       console.log(checkingType);
     } catch (error) {
@@ -212,7 +212,7 @@ const CreateQuestions = () => {
                     </div>
                   </>
                 )}
-                {question.type === QuestionTypes.FillUp && (
+                {(question.type === QuestionTypes.FillUp || question.type===QuestionTypes.MCQ) && (
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Correct Answer</label>
                     <input

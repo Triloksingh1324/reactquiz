@@ -3,25 +3,21 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { authenticateUser } from '../../../middleware/authenticate_user';
 
 const QuizDetailPage = ({ params }) => {
   const router = useRouter();
-
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { authenticated, userId } = await authenticateUser();
-      
+      const authenticated = await axios.get(`/api/middleware?quizId=${params.slug}`);
       if (!authenticated) {
-        // router.push('/login');
-        return;
+        return "You are not authenticated";
       }
-      setUserId(userId);
+      setIsAuthorized(true);
     };
 
     const fetchQuizDetails = async () => {
@@ -40,12 +36,6 @@ const QuizDetailPage = ({ params }) => {
     }
   }, [params.slug]);
 
-  useEffect(() => {
-    if (quiz && userId) {
-      setIsAuthorized(quiz.creatorId === userId);
-    }
-  }, [quiz, userId]);
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -54,7 +44,7 @@ const QuizDetailPage = ({ params }) => {
     return <div>Quiz not found.</div>;
   }
 
-  const { questions, creatorId, isPublished } = quiz;
+  const { questions, isPublished } = quiz;
 
   const handlePrintQuiz = () => {
     window.print();
@@ -70,6 +60,10 @@ const QuizDetailPage = ({ params }) => {
         ...prevState,
         isPublished: true
       }));
+      setSuccessMessage('Your quiz has been generated successfully!');
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000); 
     } catch (error) {
       console.error('Error generating quiz:', error);
     }
@@ -107,14 +101,14 @@ const QuizDetailPage = ({ params }) => {
               </button>
             </>
           )}
-          <button
-            onClick={handlePrintQuiz}
-            className="bg-green-500 text-white px-4 py-2 rounded-md"
-          >
-            Print Quiz
-          </button>
+         
         </div>
       </div>
+      {successMessage && (
+        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+          <p className="font-bold">{successMessage}</p>
+        </div>
+      )}
       <div className="flex">
         <div className="w-3/4 pr-4">
           <h2 className="text-xl font-bold mb-4">Quiz Questions</h2>

@@ -54,15 +54,21 @@ const QuizCreatorSchema = new mongoose.Schema({
     default: false,
     required: true
   },
-  timeframe: {
-    type: String,
-    required: function() {
-      return this.isTimed === true;
-    }
+  startTime:{
+    type: Date,
+    default: null,
+  },
+  endTime:{
+    type: Date,
+    default: null,
   },
   isPublished:{
     type: Boolean,
     default: false,
+  },
+  totalScore:{
+    type: Number,
+    default: null,
   },
   questions: [QuestionSchema]
 }, { timestamps: true });

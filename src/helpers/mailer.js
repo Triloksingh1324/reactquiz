@@ -43,3 +43,6 @@ export const sendEmail = async({email, emailType, userId}) => {
         throw new Error(error.message);
     }
 }
+
+
+

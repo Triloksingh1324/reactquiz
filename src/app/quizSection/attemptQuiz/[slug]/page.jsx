@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getCookie } from 'cookies-next';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import jwt from 'jsonwebtoken';
 
 const AttemptQuizPage = ({ params }) => {
@@ -11,44 +11,56 @@ const AttemptQuizPage = ({ params }) => {
   const [quiz, setQuiz] = useState(null);
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState('667ff8d052a4e2f601b4a9a9');
+  const [userId, setUserId] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const fetchQuizDetails = async () => {
       try {
-        console.log(params.slug);
         const response = await axios.get(`/api/quiz/getquiz?quizId=${params.slug}`);
-        console.log(response.data.quiz);
         setQuiz(response.data.quiz);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching quiz details:', error);
+        setLoading(false);
       }
     };
 
-    // const decodeToken = () => {
-    //   const accessToken = Cookies.get('accessToken');
-    //   console.log('Access token:', accessToken);
-    //   if (accessToken) {
-    //     try {
-    //       const decodedToken = jwt.decode(accessToken);
-    //       setUserId(decodedToken.id);
-    //     } catch (error) {
-    //       console.error('Error decoding token:', error);
-    //     }
-    //   } else {
-    //     router.push('/login');
-    //   }
-    // };
+    const checkUniqueAttempt = async () => {
+      try {
+        const token = getCookie('accessToken');
+        const decodedToken = jwt.decode(token);
+        if (!decodedToken) {
+          console.error('Invalid token.');
+          router.push('/login');
+          return;
+        }
+
+        setUserId(decodedToken.id);
+        const reattempt = await axios.get(`/api/quiz/attempt?userId=${userId}&quizId=${params.slug}`);
+        if (reattempt.data.success) {
+          console.log("Quiz already attempted");
+          router.push(`/quizSection/getresult/${params.slug}`);
+        }
+      } catch (error) {
+        console.error('Error checking quiz attempt:', error);
+      }
+    };
 
     if (params.slug) {
       fetchQuizDetails();
+      checkUniqueAttempt();
     }
-    // decodeToken();
-  }, [params.slug]);
+
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+
+  }, [params.slug, router, userId]);
 
   const handleChange = (questionId, answer) => {
-    console.log(`Updating response for questionId ${questionId} with answer ${answer}`);
     const existingResponse = responses.find(response => response.questionId === questionId);
     if (existingResponse) {
       setResponses(
@@ -62,9 +74,21 @@ const AttemptQuizPage = ({ params }) => {
   };
 
   const handleSubmit = async () => {
+    if (!quiz.isPublished) {
+      alert('Quiz is not published yet.');
+      return;
+    }
+
+    const startTime = new Date(quiz.startTime);
+    const endTime = new Date(quiz.endTime);
+
+    if (currentTime < startTime || currentTime > endTime) {
+      alert('Quiz is not within the allowed time frame.');
+      return;
+    }
+
     try {
-      console.log("checking", params.slug);
-      const response = await axios.post('/api/quiz/attempt', {
+      await axios.post('/api/quiz/attempt', {
         quizId: params.slug,
         userId,
         responses,
@@ -81,6 +105,17 @@ const AttemptQuizPage = ({ params }) => {
 
   if (!quiz) {
     return <div>Quiz not found.</div>;
+  }
+
+  const startTime = new Date(quiz.startTime);
+  const endTime = new Date(quiz.endTime);
+
+  if (!quiz.isPublished) {
+    return <div>The quiz is not published yet.</div>;
+  }
+
+  if (currentTime < startTime || currentTime > endTime) {
+    return <div>The quiz is not available at this time.</div>;
   }
 
   return (

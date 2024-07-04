@@ -15,10 +15,11 @@ export default function LoginPage() {
   const onLogin = async () => {
     try {
       const response = await axios.post("/api/users/login", user);
+
+
       
       console.log("Login successful", response.data);
-
-      router.replace("/");
+      router.push("/");
     
     } catch (error) {
       console.log("Login failed", error.message);
