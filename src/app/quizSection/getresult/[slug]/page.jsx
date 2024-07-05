@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCookie,getCookies } from 'cookies-next';
+import { getCookie, getCookies } from 'cookies-next';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
@@ -14,14 +14,14 @@ const QuizResultPage = ({ params }) => {
   useEffect(() => {
     const fetchQuizResult = async () => {
       try {
-        const cook=getCookies();
+        const cook = getCookies();
         console.log(cook);
         const token = getCookie('accessToken');
         console.log("Token:", token);
-        
+
         if (!token) {
           console.error('Access token not found.');
-        return;
+          return;
         }
 
         const decodedToken = jwt.decode(token);
@@ -83,16 +83,27 @@ const QuizResultPage = ({ params }) => {
             <div key={index} className="mb-6 p-4 border border-gray-300 rounded-md">
               <p className="text-lg font-semibold mb-2">{`${index + 1}. ${question.content}`}</p>
               <p className="text-sm text-gray-600">Marks: {question.score}</p>
-              <p className={`text-sm mb-2 ${isCorrect ? 'text-green-500' : 'text-red-500'}`}>
-                Your Answer: {userAnswer ? userAnswer.answer : 'Not Answered'} {isCorrect ? '✔' : '✘'}
-              </p>
-              {status === 'declared' && !isCorrect && question.correctAnswer && (
-                <p className="text-sm text-gray-600">Correct Answer: {question.correctAnswer}</p>
-              )}
               {status === 'declared' && (
-                <p className="text-sm text-gray-600">
-                  Marks Obtained: {userAnswer?.score || 0} / {question.score}
-                </p>
+                <>
+                 {isCorrect === null ? (
+                    <p className="text-sm mb-2">
+                      Your Answer: {userAnswer ? userAnswer.answer : 'Not Answered'}
+                    </p>
+                  ) : (
+                    <p className={`text-sm mb-2 ${isCorrect ? 'text-green-500' : 'text-red-500'}`}>
+                      Your Answer: {userAnswer ? userAnswer.answer : 'Not Answered'} {isCorrect ? '✔' : '✘'}
+                    </p>
+                  )}
+                  {!isCorrect && question.correctAnswer && (
+                    <p className="text-sm text-gray-600">Correct Answer: {question.correctAnswer}</p>
+                  )}
+                  <p className="text-sm text-gray-600">
+                    Marks Obtained: {userAnswer?.score || 0} / {question.score}
+                  </p>
+                </>
+              )}
+              {status === 'pending' && (
+                <p className="text-sm text-gray-600">Your Answer: {userAnswer ? userAnswer.answer : 'Not Answered'}</p>
               )}
             </div>
           );

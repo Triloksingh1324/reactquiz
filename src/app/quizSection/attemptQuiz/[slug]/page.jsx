@@ -78,15 +78,6 @@ const AttemptQuizPage = ({ params }) => {
       alert('Quiz is not published yet.');
       return;
     }
-
-    const startTime = new Date(quiz.startTime);
-    const endTime = new Date(quiz.endTime);
-
-    if (currentTime < startTime || currentTime > endTime) {
-      alert('Quiz is not within the allowed time frame.');
-      return;
-    }
-
     try {
       await axios.post('/api/quiz/attempt', {
         quizId: params.slug,
@@ -106,15 +97,14 @@ const AttemptQuizPage = ({ params }) => {
   if (!quiz) {
     return <div>Quiz not found.</div>;
   }
+  const startTime = quiz.startTime ? new Date(quiz.startTime) : null;
+  const endTime = quiz.endTime? new Date(quiz.endTime):null;
 
-  const startTime = new Date(quiz.startTime);
-  const endTime = new Date(quiz.endTime);
 
   if (!quiz.isPublished) {
     return <div>The quiz is not published yet.</div>;
   }
-
-  if (currentTime < startTime || currentTime > endTime) {
+  if ((startTime && currentTime < startTime) ||(endTime && currentTime > endTime)) {
     return <div>The quiz is not available at this time.</div>;
   }
 

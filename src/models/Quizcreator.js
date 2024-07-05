@@ -73,6 +73,15 @@ const QuizCreatorSchema = new mongoose.Schema({
   questions: [QuestionSchema]
 }, { timestamps: true });
 
+QuizCreatorSchema.pre('save', function(next) {
+  if (this.questions && this.questions.length > 0) {
+    this.totalScore = this.questions.reduce((acc, question) => acc + question.score, 0);
+  } else {
+    this.totalScore = 0;
+  }
+  next();
+});
+
 const QuizCreator = mongoose.models.QuizCreator || mongoose.model('QuizCreator', QuizCreatorSchema);
 
 export default QuizCreator;

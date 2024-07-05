@@ -16,7 +16,9 @@ export async function POST(req) {
       console.error('Quiz not found:', quizId);
       return new Response(JSON.stringify({ success: false, error: 'Quiz not found' }), { status: 404 });
     }
-
+    console.log('Quiz found:', quiz);
+    const title=quiz.title;
+    console.log("title",title);
     let totalScore = 0;
     let status = 'pending';
 
@@ -50,7 +52,7 @@ export async function POST(req) {
 
     await User.findByIdAndUpdate(
       userId,
-      { $push: { quizzesTaken: { quiz: quizId, score: totalScore } } }
+      { $push: { quizzesTaken: { quiz: quizId, score: totalScore,status:status,title:title } } }
     );
 
     console.log('Response saved successfully:', newResponse);

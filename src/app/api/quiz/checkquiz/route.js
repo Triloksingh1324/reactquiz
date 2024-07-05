@@ -4,48 +4,64 @@ import { connect } from '../../../../dbconfig';
 import { NextResponse } from 'next/server';
 connect();
 
-export async function POST(req) {
-  try {
-    const { quizId, userId, responses } = await req.json();
 
-    const quiz = await QuizCreator.findById(quizId);
-    if (!quiz) {
-      return new Response(JSON.stringify({ success: false, error: 'Quiz not found' }), { status: 404 });
+export async function PUT(req) {
+  try {
+    const { quizId, userId, scores, status } = await req.json();
+    console.log('quizId:', quizId);
+    console.log('userId:', userId);
+    console.log('scores:', scores);
+    console.log('status:', status);
+
+    if (typeof scores !== 'object' || scores === null) {
+      return NextResponse.json({ success: false, error: 'Scores must be an object' }, { status: 400 });
+    }
+
+    // Find the quiz response by quizId and userId
+    const existingResponse = await Response.findOne({ quizId, userId }).populate({
+      path: 'quizId',
+      populate: {
+        path: 'questions',
+        model: 'Question'
+      }
+    });
+    console.log("this is response", existingResponse);
+
+    if (!existingResponse) {
+      return NextResponse.json({ success: false, error: 'Response not found' }, { status: 404 });
     }
 
     let totalScore = 0;
 
-    responses.forEach(response => {
-      const question = quiz.questions.id(response.questionId);
+    Object.entries(scores).forEach(([questionId, score]) => {
+      const question = existingResponse.quizId.questions.find(q => q._id.equals(questionId));
       if (question) {
-        if (question.type === 'MCQ' || question.type === 'FillUp') {
-          response.isCorrect = question.correctAnswer.toLowerCase() === response.answer.toLowerCase();
-          response.score = response.isCorrect ? question.score : 0;
-        } else if (question.type === 'Subjective') {
-          response.isCorrect = null;
-          response.score = response.score <= question.score ? response.score : question.score;
+        const answer = existingResponse.answers.find(a => a.questionId.equals(questionId));
+        if (answer) {
+          if (question.type === 'MCQ' || question.type === 'FillUp') {
+            answer.isCorrect = question.correctAnswer.toLowerCase() === answer.answer.toLowerCase();
+            answer.score = answer.isCorrect ? question.score : 0;
+          } else if (question.type === 'Subjective') {
+            answer.isCorrect = null;
+            answer.score = score <= question.score ? score : question.score;
+          }
+          totalScore += answer.score;
         }
-        totalScore += response.score;
       }
     });
 
-    const existingResponse = await Response.findOne({ quizId, userId });
-    if (!existingResponse) {
-      return new Response(JSON.stringify({ success: false, error: 'Response not found' }), { status: 404 });
-    }
+    existingResponse.status = status;
+    existingResponse.totalScore = totalScore;
 
-    existingResponse.answers = responses;
-    existingResponse.totalScore = quiz.grades ? totalScore : null;
-    existingResponse.status = 'declared';
+    await existingResponse.save(); // Save updated response
 
-    await existingResponse.save();
-
-    return new Response(JSON.stringify({ success: true, message: 'Responses checked successfully' }), { status: 200 });
+    return NextResponse.json({ success: true, message: 'Responses checked successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error checking responses:', error);
-    return new Response(JSON.stringify({ error: error.message }), { status: 400 });
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
+
 
 export async function GET(req) {
   try {
@@ -53,7 +69,7 @@ export async function GET(req) {
     const quizId = searchParams.get('quizId');
     console.log("get ",quizId);
     if (!quizId) {
-      return new Response(JSON.stringify({ success: false, error: 'Quiz ID is required' }), { status: 400 });
+      return NextResponse.json({ success: false, error: 'Quiz ID is required' },{ status: 400 });
     }
 
     const responses = await Response.find({ quizId }).populate('userId');
@@ -63,7 +79,7 @@ export async function GET(req) {
 
   } catch (error) {
     console.error('Error fetching responses:', error);
-    return new Response(JSON.stringify({ success: false, error: error.message }), { status: 400 });
+    return NextResponse.json({ success: false, error: error.message },{ status: 400 });
   }
 }
 

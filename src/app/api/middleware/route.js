@@ -13,17 +13,12 @@ export async function GET(req) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get('accessToken');
   console.log(accessToken.value);
-
   if (!accessToken) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
-
   try {
     const decodedToken = jwt.verify(accessToken.value, process.env.Access_TOKEN_SECRET);
-    console.log("decoded token: " , decodedToken)
-  
-  
-    
+    console.log("decoded token: " , decodedToken)   
     const response = await QuizCreator.findById(quizId);
     console.log("response",response);
     if (!response) {

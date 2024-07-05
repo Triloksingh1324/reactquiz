@@ -19,9 +19,24 @@ const CheckUserResponsePage = ({ params }) => {
         const responseRes = await axios.get(`/api/quiz/checkresponse?quizId=${quizId}&userId=${userId}`);
         const questionsRes = await axios.get(`/api/quiz/getquiz?quizId=${quizId}`);
         console.log("questionsRes: ", questionsRes);
-        setResponse(responseRes.data.response);
-        setQuestions(questionsRes.data.quiz.questions);
-        console.log("questions: ", questionsRes.data.quiz.questions);
+
+        const response = responseRes.data.response;
+        const questions = questionsRes.data.quiz.questions;
+
+        // Set initial scores
+        const initialScores = {};
+        response.answers.forEach(answer => {
+          const question = questions.find(q => q._id === answer.questionId);
+          if (question.type === 'MCQ' && answer.answer === question.correctAnswer) {
+            initialScores[answer.questionId] = question.score; // Automatically award full score for correct MCQ answers
+          } else {
+            initialScores[answer.questionId] = answer.score || 0; // Set existing score or 0
+          }
+        });
+
+        setResponse(response);
+        setQuestions(questions);
+        setScores(initialScores);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching user response or questions:', error);
@@ -36,18 +51,14 @@ const CheckUserResponsePage = ({ params }) => {
     setScores({ ...scores, [questionId]: score });
   };
 
-
   const handleAddSuggestion = (questionId, answerIndex) => {
-    // const updatedResponse = {...response };
-    // updatedResponse.answers[answerIndex].suggestions.push(questionId);
-    // setResponse(updatedResponse);
-    crossOriginIsolated.log("error here")//to be  solved
+    console.log("Add suggestion for question:", questionId, "answer index:", answerIndex);
   };
 
   const handleSubmit = async () => {
     try {
       const { quizId, userId } = params;
-      await axios.post(`/api/quiz/updateResponse`, {
+      await axios.put(`/api/quiz/checkquiz`, {
         quizId,
         userId,
         scores,
@@ -78,7 +89,7 @@ const CheckUserResponsePage = ({ params }) => {
       <ul>
         {response.answers.map((answer, index) => {
           const question = questions.find(q => q._id === answer.questionId);
-          if (!question) return null; 
+          if (!question) return null;
           const isCorrect = answer.isCorrect !== null ? answer.isCorrect : false;
           const answerColor = isCorrect ? 'text-green-600' : 'text-red-600';
           const correctAnswer = question.correctAnswer;
@@ -98,16 +109,16 @@ const CheckUserResponsePage = ({ params }) => {
                     ))}
                   </ul>
                 )}
-                <p className="mb-2"><strong>Your Answer:</strong> <span className={answerColor}>{answer.answer}</span></p>
-                <p className="mb-2"><strong>Score:</strong> {answer.score}</p>
-                {question.type === 'subjective' && (
+                <p className="mb-2"><strong>User Answer:</strong> <span className={answerColor}>{answer.answer}</span></p>
+                <p className="mb-2"><strong>Score:</strong> {scores[answer.questionId]}</p>
+                {question.type === 'Subjective' && (
                   <div className="mb-2">
                     <label className="block">
                       Score (out of {question.score}):
                       <input
                         type="number"
                         value={scores[answer.questionId] || ''}
-                        onChange={(e) => handleScoreChange(answer.questionId, e.target.value)}
+                        onChange={(e) => handleScoreChange(answer.questionId, Math.min(e.target.value, question.score))}
                         max={question.score}
                         min="0"
                         className="mt-1 p-2 border rounded-md"
@@ -116,12 +127,13 @@ const CheckUserResponsePage = ({ params }) => {
                   </div>
                 )}
                 <button onClick={() => handleAddSuggestion(question._id, index)} className="mt-2 p-2 bg-blue-500 text-white rounded">Add Suggestion</button>
+                {/* //have to correct this later */}
               </div>
             </li>
           );
         })}
       </ul>
-      
+
       <button onClick={handleSubmit} className="mt-4 p-2 bg-blue-500 text-white rounded">Submit</button>
       <button onClick={() => router.back()} className="mt-4 ml-2 p-2 bg-gray-500 text-white rounded">Go Back</button>
     </div>
@@ -129,4 +141,3 @@ const CheckUserResponsePage = ({ params }) => {
 };
 
 export default CheckUserResponsePage;
-

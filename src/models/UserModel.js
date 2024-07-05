@@ -19,10 +19,17 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  quizzesCreated: [{ type: mongoose.Schema.Types.ObjectId, ref: "QuizCreator" }],
+  quizzesCreated: [{ quiz:{type: mongoose.Schema.Types.ObjectId, ref: "QuizCreator"},
+    title:{ type: String}
+  }],
   quizzesTaken: [{
     quiz: { type: mongoose.Schema.Types.ObjectId, ref: "QuizCreator" },
-    score: { type: Number }
+    score: { type: Number },
+    status:{
+      type: String,
+      default: 'pending'
+    },
+    title:{ type: String}
   }],
   forgotPasswordToken: String,
   forgotPasswordTokenExpiry: Date,

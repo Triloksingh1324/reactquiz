@@ -38,7 +38,7 @@ export async function POST(req, res) {
     await newQuiz.save();
     const userToUpdate = await User.findByIdAndUpdate(
       user._id,
-      { $push: { quizzesCreated: newQuiz._id } },
+      { $push: { quizzesCreated: {quiz: newQuiz._id ,title: title}}},
       { new: true }
     );
     if (!userToUpdate) {
