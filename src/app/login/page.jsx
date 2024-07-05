@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { setCookie } from "cookies-next";
 // import { sendEmail } from "@/helpers/mailer";
 
 export default function LoginPage() {
@@ -15,14 +16,14 @@ export default function LoginPage() {
   const onLogin = async () => {
     try {
       const response = await axios.post("/api/users/login", user);
-
-
+      console.log(response.data);
+    
       
       console.log("Login successful", response.data);
-      router.push("/");
+      // router.push("/");
     
     } catch (error) {
-      console.log("Login failed", error.message);
+      console.log("Login failed", error);
     }
   };
   const onForgot = async () => {
@@ -346,7 +347,7 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-            <form  method="POST" className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label
                   htmlfor="username"
@@ -394,14 +395,14 @@ export default function LoginPage() {
                   Login
                 </button>
               </div>
-            </form>
+              </div>
             <div className="mt-4 text-sm text-gray-600 text-center">
               <p>
                 {/* eslint-disable-next-line react/no-unescaped-entities */}
                 Don't have an account?{" "}
-                <a href="#" className="text-black hover:underline">
+                <Link href="/signup" className="text-black hover:underline">
                   Sign Up here
-                </a>
+                </Link>
               </p>
             </div>
           </div>

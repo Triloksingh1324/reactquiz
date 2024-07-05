@@ -336,7 +336,7 @@ export default function SignupPage() {
             <div className="mt-4 text-sm text-gray-600 text-center">
               <p>or with email</p>
             </div>
-            <form action="#" method="POST" className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label
                   for="username"
@@ -400,13 +400,13 @@ export default function SignupPage() {
                   Sign Up
                 </button>
               </div>
-            </form>
+            </div>
             <div className="mt-4 text-sm text-gray-600 text-center">
               <p>
                 Already have an account?{" "}
-                <a href="#" className="text-black hover:underline">
+                <Link href="/login" className="text-black hover:underline">
                   Login here
-                </a>
+                  </Link>
               </p>
             </div>
           </div>

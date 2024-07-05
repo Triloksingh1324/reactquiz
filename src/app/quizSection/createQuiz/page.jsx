@@ -154,7 +154,9 @@ const CreateQuiz = () => {
           </form>
         </div>
       </div>
-      <Footer />
+     
+        <Footer />
+      
     </>
   );
 };
