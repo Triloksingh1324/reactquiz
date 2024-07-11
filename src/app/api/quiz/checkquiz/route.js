@@ -2,12 +2,13 @@ import QuizCreator from '../../../../models/Quizcreator';
 import Response from '../../../../models/Quizresponse';
 import { connect } from '../../../../dbconfig';
 import { NextResponse } from 'next/server';
+import User from '../../../../models/UserModel';
 connect();
 
 
 export async function PUT(req) {
   try {
-    const { quizId, userId, scores, status } = await req.json();
+    const { quizId, userId, scores, status,title } = await req.json();
     console.log('quizId:', quizId);
     console.log('userId:', userId);
     console.log('scores:', scores);
@@ -53,7 +54,11 @@ export async function PUT(req) {
     existingResponse.status = status;
     existingResponse.totalScore = totalScore;
 
-    await existingResponse.save(); // Save updated response
+    await existingResponse.save();
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { quizzesTaken: { quiz: quizId, score: totalScore,status:status,title:title } } }
+    )
 
     return NextResponse.json({ success: true, message: 'Responses checked successfully' }, { status: 200 });
   } catch (error) {

@@ -1,13 +1,12 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 const QuestionTypes = {
-  MCQ: 'MCQ',
-  FillUp: 'FillUp',
-  Subjective: 'Subjective'
+  MCQ: "MCQ",
+  FillUp: "FillUp",
+  Subjective: "Subjective",
 };
 
 const CreateQuestions = () => {
@@ -16,16 +15,16 @@ const CreateQuestions = () => {
   const [questions, setQuestions] = useState([]);
   const [initialQuestions, setInitialQuestions] = useState([]);
   const [isGradingEnabled, setIsGradingEnabled] = useState(false);
-  const [checkingType, setCheckingType] = useState('');
+  const [checkingType, setCheckingType] = useState("");
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      const quizIdFromUrl = urlParams.get('quizId');
+      const quizIdFromUrl = urlParams.get("quizId");
       setQuizId(quizIdFromUrl);
 
       if (!quizIdFromUrl) {
-        router.push('/quizSection/createQuiz');
+        router.push("/quizSection/createQuiz");
       } else {
         fetchQuizDetails(quizIdFromUrl);
         fetchQuestions(quizIdFromUrl);
@@ -38,30 +37,31 @@ const CreateQuestions = () => {
       const response = await axios.get(`/api/quiz/getquiz?quizId=${quizId}`);
       setIsGradingEnabled(response.data.quiz.grades);
       setCheckingType(response.data.quiz.checkingType);
-      console.log(checkingType);
     } catch (error) {
-      console.error('Error fetching quiz details:', error);
+      console.error("Error fetching quiz details:", error);
     }
   };
 
   const fetchQuestions = async (quizId) => {
     try {
       const response = await axios.get(`/api/quiz/getquiz?quizId=${quizId}`);
-      console.log(response.data.quiz.questions);
       setQuestions(response.data.quiz.questions || []);
       setInitialQuestions(response.data.quiz.questions || []);
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error("Error fetching questions:", error);
     }
   };
 
   const handleAddQuestion = () => {
-    setQuestions([...questions, { type: '', content: '', options: [], correctAnswer: '', score: null }]);
+    setQuestions([
+      ...questions,
+      { type: "", content: "", options: [], correctAnswer: "", score: null },
+    ]);
   };
 
   const handleQuestionChange = (index, field, value) => {
     const newQuestions = [...questions];
-    if (field === 'score') {
+    if (field === "score") {
       newQuestions[index][field] = parseInt(value);
     } else {
       newQuestions[index][field] = value;
@@ -77,7 +77,7 @@ const CreateQuestions = () => {
 
   const handleAddOption = (index) => {
     const newQuestions = [...questions];
-    newQuestions[index].options.push({ optionText: '' });
+    newQuestions[index].options.push({ optionText: "" });
     setQuestions(newQuestions);
   };
 
@@ -87,13 +87,16 @@ const CreateQuestions = () => {
   };
 
   const handleTypeSelection = (index, type) => {
-    if (type === QuestionTypes.Subjective && checkingType === 'automatic') {
+    if (type === QuestionTypes.Subjective && checkingType === "automatic") {
       return;
     }
     const newQuestions = [...questions];
     newQuestions[index].type = type;
-    if (type === QuestionTypes.MCQ && newQuestions[index].options.length === 0) {
-      newQuestions[index].options.push({ optionText: '' });
+    if (
+      type === QuestionTypes.MCQ &&
+      newQuestions[index].options.length === 0
+    ) {
+      newQuestions[index].options.push({ optionText: "" });
     }
     setQuestions(newQuestions);
   };
@@ -101,7 +104,7 @@ const CreateQuestions = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formattedQuestions = questions.map(question => {
+      const formattedQuestions = questions.map((question) => {
         if (question.type !== QuestionTypes.MCQ) {
           delete question.options;
         }
@@ -109,11 +112,13 @@ const CreateQuestions = () => {
       });
 
       const removedQuestions = initialQuestions.filter(
-        initialQuestion => !formattedQuestions.some(
-          question => question._id === initialQuestion._id
-        )
+        (initialQuestion) =>
+          !formattedQuestions.some(
+            (question) => question._id === initialQuestion._id
+          )
       );
-      await axios.put('/api/quiz/createquestion', {
+
+      await axios.put("/api/quiz/createquestion", {
         quizId,
         questions: formattedQuestions,
         removedQuestions,
@@ -121,17 +126,21 @@ const CreateQuestions = () => {
 
       router.push(`/quizSection/Quizzes/${quizId}`);
     } catch (error) {
-      console.error('Error adding questions:', error);
+      console.error("Error adding questions:", error);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Add Questions to Quiz</h1>
         <button
           type="submit"
-          className={`bg-green-500 text-white px-4 py-2 rounded-md ${questions && questions.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`bg-green-500 text-white px-4 py-2 rounded-md ${
+            questions && questions.length === 0
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
           disabled={!questions || questions.length === 0}
           onClick={handleSubmit}
         >
@@ -140,29 +149,58 @@ const CreateQuestions = () => {
       </div>
       <form onSubmit={handleSubmit}>
         {!questions || questions.length === 0 ? (
-          <div className="flex justify-center items-center h-64">
+          <div className="flex min-h-screen justify-center items-center">
             <button
               type="button"
               onClick={handleAddQuestion}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md"
+              className="bg-blue-500 text-white px-5 py-4 rounded-xl hover:bg-blue-400"
             >
               Add Question
             </button>
           </div>
         ) : (
-          <>
+          <div className="space-y-6">
             {questions.map((question, index) => (
-              <div key={index} className="mb-6 p-4 border border-gray-300 rounded-md">
+              <div
+                key={index}
+                className="bg-white p-4 rounded-lg shadow-md mx-20"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold">
+                    Question {index + 1}
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveQuestion(index)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-md"
+                  >
+                    Remove
+                  </button>
+                </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Question Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Question Type
+                  </label>
                   <div className="flex space-x-4">
                     {Object.values(QuestionTypes).map((type) => (
                       <button
                         key={type}
                         type="button"
-                        className={`p-4 border rounded-md cursor-pointer ${question.type === type ? 'border-blue-500' : 'border-gray-300'} ${type === QuestionTypes.Subjective && checkingType === 'automatic' ? 'cursor-not-allowed opacity-50' : ''}`}
+                        className={`p-4 border rounded-md cursor-pointer ${
+                          question.type === type
+                            ? "border-blue-500"
+                            : "border-gray-300"
+                        } ${
+                          type === QuestionTypes.Subjective &&
+                          checkingType === "automatic"
+                            ? "cursor-not-allowed opacity-50"
+                            : ""
+                        }`}
                         onClick={() => handleTypeSelection(index, type)}
-                        disabled={type === QuestionTypes.Subjective && checkingType === 'automatic'}
+                        disabled={
+                          type === QuestionTypes.Subjective &&
+                          checkingType === "automatic"
+                        }
                       >
                         <span>{type}</span>
                       </button>
@@ -170,35 +208,41 @@ const CreateQuestions = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Question Content</label>
-                  <input
-                    type="text"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Question Content
+                  </label>
+                  <textarea
                     value={question.content}
-                    onChange={(e) => handleQuestionChange(index, 'content', e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    onChange={(e) =>
+                      handleQuestionChange(index, "content", e.target.value)
+                    }
+                    className="w-full p-4 border border-gray-300 rounded-md"
                     required
                   />
                 </div>
                 {question.type === QuestionTypes.MCQ && (
                   <>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Options
+                      </label>
                       {question.options.map((option, optionIndex) => (
-                        <div key={optionIndex} className="flex items-center mb-2">
+                        <div
+                          key={optionIndex}
+                          className="flex items-center mb-2"
+                        >
                           <input
                             type="text"
                             value={option.optionText}
-                            onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                            onChange={(e) =>
+                              handleOptionChange(
+                                index,
+                                optionIndex,
+                                e.target.value
+                              )
+                            }
                             className="w-full p-2 border border-gray-300 rounded-md mr-2"
                             required
-                          />
-                          <input
-                            type="radio"
-                            name={`correctOption-${index}`}
-                            value={option.optionText}
-                            checked={question.correctAnswer === option.optionText}
-                            onChange={(e) => handleQuestionChange(index, 'correctAnswer', e.target.value)}
-                            className="form-radio"
                           />
                         </div>
                       ))}
@@ -212,51 +256,65 @@ const CreateQuestions = () => {
                     </div>
                   </>
                 )}
-                {(question.type === QuestionTypes.FillUp || question.type===QuestionTypes.MCQ) && (
+                {(question.type === QuestionTypes.FillUp ||
+                  question.type === QuestionTypes.MCQ) && (
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Correct Answer</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Correct Answer
+                    </label>
                     <input
                       type="text"
                       value={question.correctAnswer}
-                      onChange={(e) => handleQuestionChange(index, 'correctAnswer', e.target.value)}
+                      onChange={(e) =>
+                        handleQuestionChange(
+                          index,
+                          "correctAnswer",
+                          e.target.value
+                        )
+                      }
                       className="w-full p-2 border border-gray-300 rounded-md"
                       required
                     />
                   </div>
                 )}
                 {isGradingEnabled && (
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Score</label>
-                    <input
-                      type="number"
+                  <div className="mb-4 flex ">
+                    <label className="block text-lg bg-orange-400 pl-10 pr-20 py-4 rounded-2xl font-medium max-w-10 text-white mb-2 mr-4">
+                      Score
+                    </label>
+                    <select
                       value={question.score}
-                      onChange={(e) => handleQuestionChange(index, 'score', e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md"
+                      onChange={(e) =>
+                        handleQuestionChange(index, "score", e.target.value)
+                      }
+                      className="w-40 p-2 border border-gray-300 rounded-md"
                       required
-                    />
+                    >
+                      <option value="">Select Score</option>
+                      {[...Array(20).keys()].map((num) => (
+                        <option key={num + 1} value={num + 1}>
+                          {num + 1}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveQuestion(index)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md"
-                >
-                  Remove Question
-                </button>
               </div>
             ))}
-            <button
-              type="button"
-              onClick={handleAddQuestion}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4"
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={handleAddQuestion}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
               >
-              Add Question
+                Add Question
               </button>
-              </>
-              )}
-              </form>
-              </div>
-              );
-              };
-              
-              export default CreateQuestions;
+            </div>
+          </div>
+        )}
+      </form>
+    </div>
+  );
+};
+
+export default CreateQuestions;

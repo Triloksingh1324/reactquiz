@@ -46,10 +46,9 @@ const QuizCreatorSchema = new mongoose.Schema({
     required: true
   },
   checkingType: {
-    type: String,
-    required: true
+    type: String
   },
-  isTimed: {
+  isTimed:{
     type: Boolean,
     default: false,
     required: true

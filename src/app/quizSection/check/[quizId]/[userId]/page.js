@@ -8,6 +8,7 @@ const CheckUserResponsePage = ({ params }) => {
   const [response, setResponse] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState("")
   const [scores, setScores] = useState({});
   const router = useRouter();
 
@@ -22,15 +23,16 @@ const CheckUserResponsePage = ({ params }) => {
 
         const response = responseRes.data.response;
         const questions = questionsRes.data.quiz.questions;
+        setTitle(questionsRes.data.quiz.title);
 
-        // Set initial scores
+       
         const initialScores = {};
         response.answers.forEach(answer => {
           const question = questions.find(q => q._id === answer.questionId);
           if (question.type === 'MCQ' && answer.answer === question.correctAnswer) {
-            initialScores[answer.questionId] = question.score; // Automatically award full score for correct MCQ answers
+            initialScores[answer.questionId] = question.score; 
           } else {
-            initialScores[answer.questionId] = answer.score || 0; // Set existing score or 0
+            initialScores[answer.questionId] = answer.score || 0; 
           }
         });
 
@@ -63,6 +65,7 @@ const CheckUserResponsePage = ({ params }) => {
         userId,
         scores,
         status: 'declared',
+        title,
       });
       alert('Response updated successfully');
       router.back();
@@ -126,8 +129,7 @@ const CheckUserResponsePage = ({ params }) => {
                     </label>
                   </div>
                 )}
-                <button onClick={() => handleAddSuggestion(question._id, index)} className="mt-2 p-2 bg-blue-500 text-white rounded">Add Suggestion</button>
-                {/* //have to correct this later */}
+               
               </div>
             </li>
           );

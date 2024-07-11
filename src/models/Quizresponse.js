@@ -12,6 +12,7 @@ const ResponseSchema = new mongoose.Schema({
     default: 'pending'
   },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  
   answers: [
     {
       questionId: { type: mongoose.Schema.Types.ObjectId, required: true },

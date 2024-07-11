@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { getCookie, getCookies } from 'cookies-next';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-
+import Navbar from '../../../components/Navbar';
+import Footer from '../../../components/Footer';
+import { BallTriangle } from 'react-loader-spinner';
 const QuizResultPage = ({ params }) => {
   const router = useRouter();
   const [response, setResponse] = useState(null);
@@ -51,7 +53,20 @@ const QuizResultPage = ({ params }) => {
   }, [params.slug, router]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center bg-gradient-to-r from-violet-200 to-pink-200 min-h-screen">
+        <BallTriangle
+          height={100}
+          width={100}
+          radius={5}
+          color="#4fa94d"
+          ariaLabel="ball-triangle-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          visible={true}
+        />
+      </div>
+    );
   }
 
   if (!response) {
@@ -62,9 +77,12 @@ const QuizResultPage = ({ params }) => {
   const { status, answers, quizId: quiz, totalScore } = response;
 
   return (
-    <div className="container mx-auto p-4">
+    <>
+    <Navbar/>
+    <div className="container mx-auto p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen">
+      <div className='mx-20'>
       <h1 className="text-2xl font-bold mb-4">Quiz Result</h1>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-row justify-between items-center mb-4">
         {status === 'pending' ? (
           <div className="bg-yellow-500 text-white px-4 py-2 rounded-md">Status: Pending</div>
         ) : (
@@ -72,6 +90,7 @@ const QuizResultPage = ({ params }) => {
             Marks Obtained: {totalScore} / {quiz.totalScore}  
           </div>
         )}
+        <div className='p-4 bg-blue-400 text-white hover:bg-blue-600 cursor-pointer' onClick={()=>{router.push(`/quizSection/Leaderboard?quizId=${params.slug}`)}}>Leaderboard</div>
       </div>
       <div>
         <h2 className="text-xl font-bold mb-4">Quiz Questions and Answers</h2>
@@ -110,6 +129,9 @@ const QuizResultPage = ({ params }) => {
         })}
       </div>
     </div>
+    </div>
+    <Footer/>
+    </>
   );
 };
 

@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { BallTriangle } from 'react-loader-spinner'
+import Navbar from '../../../components/Navbar';
+import Footer from '../../../components/Footer';
 
 const QuizDetailPage = ({ params }) => {
   const router = useRouter();
@@ -37,7 +40,18 @@ const QuizDetailPage = ({ params }) => {
   }, [params.slug]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return  <div className="flex justify-center items-center min-h-screen">
+    <BallTriangle
+    height={100}
+    width={100}
+    radius={5}
+    color="#4fa94d"
+    ariaLabel="ball-triangle-loading"
+    wrapperStyle={{}}
+    wrapperClass=""
+    visible={true}
+    />
+  </div>;
   }
 
   if (!quiz) {
@@ -78,7 +92,11 @@ const QuizDetailPage = ({ params }) => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <>
+    <Navbar/>
+
+    <div className='bg-gradient-to-r from-violet-200 to-pink-200  min-h-screen'>
+    <div className="container mx-auto p-4 ">
       <h1 className="text-2xl font-bold mb-4">Quiz Details</h1>
       <div className="flex justify-between items-center mb-4">
         <div className="flex">
@@ -113,7 +131,7 @@ const QuizDetailPage = ({ params }) => {
         <div className="w-3/4 pr-4">
           <h2 className="text-xl font-bold mb-4">Quiz Questions</h2>
           {questions.map((question, index) => (
-            <div key={index} className="mb-6 p-4 border border-gray-300 rounded-md">
+            <div key={index} className="mb-6 p-4 border-gray-300 rounded-md">
               <p className="text-lg font-semibold mb-2">{`${index + 1}. ${question.content}`}</p>
               <p className="text-sm text-gray-600">Marks: {question.score}</p>
               {question.type === 'MCQ' && (
@@ -128,14 +146,7 @@ const QuizDetailPage = ({ params }) => {
         </div>
         <div className="w-1/4">
           <h2 className="text-xl font-bold mb-4">Quiz Controls</h2>
-          <div className="mb-4">
-            <button
-              disabled={isAuthorized}
-              className={`bg-blue-500 text-white px-4 py-2 rounded-md ${isAuthorized ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              {isAuthorized ? 'Attempt Disabled' : 'Attempt Quiz'}
-            </button>
-          </div>
+         
           <div>
             <button
               onClick={handlePrintQuiz}
@@ -147,6 +158,9 @@ const QuizDetailPage = ({ params }) => {
         </div>
       </div>
     </div>
+    </div>
+    <Footer/>
+    </>
   );
 };
 
