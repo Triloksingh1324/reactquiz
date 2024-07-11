@@ -2,8 +2,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../../components/Navbar";
+import {Suspense} from "react";
 import Footer from "../../components/Footer"
 import { useSearchParams } from 'next/navigation'
+
+
 const Leaderboard = () => {
     const searchParams = useSearchParams();
   const [leaderboard, setLeaderboard] = useState([]);
@@ -47,4 +50,10 @@ const Leaderboard = () => {
   );
 };
 
-export default Leaderboard;
+export default function SuspenseLeaderboard() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Leaderboard />
+    </Suspense>
+  );
+}
