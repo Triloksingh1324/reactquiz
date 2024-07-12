@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { getCookie } from 'cookies-next';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
+import Navbar from '../../../components/Navbar';
+import Footer from '../../../components/Footer';
 
 const Aiprompt=({ params })=> {
   const router = useRouter();
@@ -56,7 +58,6 @@ const Aiprompt=({ params })=> {
       setQuestions(result.questions);
       setLoading(false);
 
-      // Redirect to the quiz section
       router.push(`/quizSection/Quizzes/${params.slug}`);
     } catch (error) {
       console.error('Error generating questions:', error);
@@ -65,7 +66,9 @@ const Aiprompt=({ params })=> {
   };
 
   return (
-    <div className="container mx-auto p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-h-screen min-w-full">
+    <>
+    <Navbar/>
+    <div className="container mx-auto md:mt-20 p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-h-screen min-w-full">
       <h1 className="text-2xl font-bold mb-4 text-center">Generate Quiz Questions</h1>
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
         <div>
@@ -109,6 +112,8 @@ const Aiprompt=({ params })=> {
       </form>
       
     </div>
+    <Footer/>
+    </>
   );
 }
 export default Aiprompt

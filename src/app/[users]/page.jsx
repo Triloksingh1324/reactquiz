@@ -34,7 +34,7 @@ const UserPage = ({ params }) => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto p-6 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen ">
+      <div className="container md:mt-20 mx-auto p-6 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen ">
         <h1 className="text-3xl font-semibold bg-gradient-to-r from-red-600 to-indigo-600 bg-clip-text text-transparent mt-10 mb-6">
           {userDetails?.userName}
         </h1>

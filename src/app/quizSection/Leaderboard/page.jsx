@@ -28,8 +28,8 @@ const Leaderboard = () => {
   return (
     <>
     <Navbar/>
-    <div className="flex flex-col items-center bg-gradient-to-r from-purple-300 to-blue-300 min-h-screen py-8  ">
-    <div className="w-full max-w-3xl bg-white shadow-md rounded-2xl p-6 mt-10">
+    <div className="flex flex-col items-center md:mt-20 bg-gradient-to-r from-purple-300 to-blue-300 min-h-screen py-8  ">
+    <div className="w-[90vw] max-w-2xl mx-4 md:mx-0 bg-white shadow-md rounded-2xl p-6 mt-10">
       <h2 className="text-3xl font-bold text-center mb-6 ">Leaderboard</h2>
       <ul className="divide-y divide-gray-200">
         {leaderboard.map((entry, index) => (

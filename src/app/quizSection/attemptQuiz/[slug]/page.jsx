@@ -138,8 +138,7 @@ const AttemptQuizPage = ({ params }) => {
           console.error('Error submitting responses:', error);
         });
       }
-    
-      // Push to the result page immediately
+
       router.push(`/quizSection/getresult/${params.slug}`);
     } 
     catch (error) {
@@ -188,10 +187,10 @@ const AttemptQuizPage = ({ params }) => {
   return (
     <div className="container p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen flex flex-col items-center">
       <h1 className="text-3xl font-bold mb-8 text-center items-start">{quiz.title}</h1>
-      <div className='flex flex-col min-w-full justify-center items-center'>
-        <div className="w-full max-w-[60vw]">
-          <div className="p-6 border-2  border-cyan-300 rounded-2xl">
-            <p className="text-lg font-semibold mb-4 text-center">{`${currentQuestionIndex + 1}. ${currentQuestion.content}`}</p>
+      <div className='flex flex-col min-w-full min-h-[80vh] justify-center items-center'>
+        <div className="w-full  bg-white md:max-w-[60vw]">
+          <div className="p-6   rounded-2xl">
+            <p className="text-lg font-semibold mb-4 ">Question {`${currentQuestionIndex + 1}. ${currentQuestion.content}`}</p>
             {currentQuestion.type === 'MCQ' ? (
               currentQuestion.options.map((option, i) => (
                 <div key={i} className="mb-2 flex ">
@@ -223,7 +222,7 @@ const AttemptQuizPage = ({ params }) => {
             
               <button
                 onClick={handlePrevious}
-                className={`bg-slate-500 text-white px-4 py-2 rounded-xl ${currentQuestionIndex === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+                className={`bg-slate-500 ml-4 text-white px-4 py-2 mb-2 rounded-xl ${currentQuestionIndex === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
                 disabled={currentQuestionIndex === 0}
               >
                <Image
@@ -237,16 +236,21 @@ const AttemptQuizPage = ({ params }) => {
             {currentQuestionIndex < quiz.questions.length - 1 ? (
               <button
                 onClick={handleNext}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                className="bg-blue-500 mr-4 mb-2 text-white px-4 py-2 rounded-xl"
               >
-                Next
+                <Image
+                src="/arrow-sm-right-svgrepo-com.svg"
+                width={50}
+                height={50}
+                alt="Next"  
+                />
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                className="bg-green-500 text-white px-4 py-2 rounded-md"
+                className="bg-green-500 text-white mr-4 mb-2 px-4 py-2 rounded-md"
               >
-                Submit Responses
+                Submit
               </button>
             )}
           </div>

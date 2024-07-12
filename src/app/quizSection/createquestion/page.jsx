@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
+import { BallTriangle } from "react-loader-spinner";
 const QuestionTypes = {
   MCQ: "MCQ",
   FillUp: "FillUp",
@@ -16,7 +19,7 @@ const CreateQuestions = () => {
   const [initialQuestions, setInitialQuestions] = useState([]);
   const [isGradingEnabled, setIsGradingEnabled] = useState(false);
   const [checkingType, setCheckingType] = useState("");
-
+  const [loader, setLoader] = useState(false);
   useEffect(() => {
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
@@ -103,6 +106,7 @@ const CreateQuestions = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoader(true);
     try {
       const formattedQuestions = questions.map((question) => {
         if (question.type !== QuestionTypes.MCQ) {
@@ -131,12 +135,27 @@ const CreateQuestions = () => {
   };
 
   return (
-    <div className="container p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen">
+    <>
+    {loader?(      <div className="flex justify-center items-center bg-gradient-to-r from-violet-200 to-pink-200 min-h-screen">
+      <BallTriangle
+        height={100}
+        width={100}
+        radius={5}
+        color="#4fa94d"
+        ariaLabel="ball-triangle-loading"
+        wrapperStyle={{}}
+        wrapperClass=""
+        visible={true}
+      />
+    </div>):(
+    <>
+    <Navbar/>
+    <div className="container p-4 md:mt-20 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Add Questions to Quiz</h1>
+        <h1 className="text-sm md:text-2xl font-bold">Add Questions to Quiz</h1>
         <button
           type="submit"
-          className={`bg-green-500 text-white px-4 py-2 rounded-md ${
+          className={`bg-green-500 text-white font-bold text-sm  px-4 py-2 rounded-2xl ${
             questions && questions.length === 0
               ? "opacity-50 cursor-not-allowed"
               : ""
@@ -144,12 +163,12 @@ const CreateQuestions = () => {
           disabled={!questions || questions.length === 0}
           onClick={handleSubmit}
         >
-          Submit Questions
+          Create
         </button>
       </div>
       <form onSubmit={handleSubmit}>
         {!questions || questions.length === 0 ? (
-          <div className="flex min-h-screen justify-center items-center">
+          <div className="flex min-h-[70vh] justify-center items-center">
             <button
               type="button"
               onClick={handleAddQuestion}
@@ -159,11 +178,11 @@ const CreateQuestions = () => {
             </button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-full">
             {questions.map((question, index) => (
               <div
                 key={index}
-                className="bg-white p-4 rounded-lg shadow-md mx-20"
+                className="bg-white p-4 rounded-lg shadow-md md:mx-20"
               >
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">
@@ -305,7 +324,7 @@ const CreateQuestions = () => {
               <button
                 type="button"
                 onClick={handleAddQuestion}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                className="bg-blue-500 text-white px-4 py-2 mb-16 rounded-md"
               >
                 Add Question
               </button>
@@ -314,6 +333,9 @@ const CreateQuestions = () => {
         )}
       </form>
     </div>
+    <Footer />
+    </>)}
+    </>
   );
 };
 

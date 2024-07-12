@@ -53,12 +53,12 @@ const QuizResponsesPage = ({ params }) => {
   return (
     <>
       <Navbar />
-      <div className="bg-gradient-to-r from-violet-200 to-pink-200 min-h-screen min-w-full">
+      <div className="bg-gradient-to-r from-violet-200 to-pink-200 min-h-screen md:mt-20 min-w-full">
         <div className="container mx-auto p-4">
           <div className="flex flex-row justify-between items-center">
-            <h1 className="text-2xl font-bold mb-4 my-10">Quiz Responses</h1>
+            <h1 className="md:text-2xl font-bold mb-4 my-10">Quiz Responses</h1>
             <div
-              className="p-2 bg-blue-400 text-white hover:bg-blue-600 cursor-pointer"
+              className="p-2 bg-blue-400 text-white mt-4 hover:bg-blue-600 cursor-pointer"
               onClick={() => {
                 router.push(`/quizSection/Leaderboard?quizId=${params.slug}`);
               }}

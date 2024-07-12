@@ -75,12 +75,12 @@ const QuizResultPage = ({ params }) => {
 
   console.log("Response:", response);
   const { status, answers, quizId: quiz, totalScore } = response;
-
+  
   return (
     <>
     <Navbar/>
-    <div className="container mx-auto p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen">
-      <div className='mx-20'>
+    <div className="container mx-auto md:mt-20 p-4 bg-gradient-to-r from-violet-200 to-pink-200 min-w-full min-h-screen mb-10">
+      <div className='md:mx-20'>
       <h1 className="text-2xl font-bold mb-4">Quiz Result</h1>
       <div className="flex flex-row justify-between items-center mb-4">
         {status === 'pending' ? (
@@ -90,7 +90,7 @@ const QuizResultPage = ({ params }) => {
             Marks Obtained: {totalScore} / {quiz.totalScore}  
           </div>
         )}
-        <div className='p-4 bg-blue-400 text-white hover:bg-blue-600 cursor-pointer' onClick={()=>{router.push(`/quizSection/Leaderboard?quizId=${params.slug}`)}}>Leaderboard</div>
+        <div className='p-2 bg-blue-400 text-white hover:bg-blue-600 cursor-pointer' onClick={()=>{router.push(`/quizSection/Leaderboard?quizId=${params.slug}`)}}>Leaderboard</div>
       </div>
       <div>
         <h2 className="text-xl font-bold mb-4">Quiz Questions and Answers</h2>
@@ -105,9 +105,13 @@ const QuizResultPage = ({ params }) => {
               {status === 'declared' && (
                 <>
                  {isCorrect === null ? (
-                    <p className="text-sm mb-2">
+                  <>
+                    <p className="text-md mb-2">
                       Your Answer: {userAnswer ? userAnswer.answer : 'Not Answered'}
+                      
                     </p>
+                     <p className="text-md text-green-500">Suggestion: {userAnswer? userAnswer.suggestion: ""}</p>
+                     </>
                   ) : (
                     <p className={`text-sm mb-2 ${isCorrect ? 'text-green-500' : 'text-red-500'}`}>
                       Your Answer: {userAnswer ? userAnswer.answer : 'Not Answered'} {isCorrect ? '✔' : '✘'}
@@ -116,6 +120,9 @@ const QuizResultPage = ({ params }) => {
                   {!isCorrect && question.correctAnswer && (
                     <p className="text-sm text-gray-600">Correct Answer: {question.correctAnswer}</p>
                   )}
+                  {question.suggestion && (
+                        <p className="text-sm text-green-500">Suggestion: {userAnswer? userAnswer.suggestion: ""}</p>
+                      )}
                   <p className="text-sm text-gray-600">
                     Marks Obtained: {userAnswer?.score || 0} / {question.score}
                   </p>

@@ -33,7 +33,7 @@ export default function Home() {
       
         <div className="flex flex-col min-h-screen">
           <Navbar />
-          <div className="flex-grow bg-gradient-to-r from-fuchsia-300 to-indigo-600 flex justify-center items-center justify-evenly py-10">
+          <div className="flex-grow bg-gradient-to-r from-fuchsia-300 to-indigo-600 flex justify-center items-center  py-10">
             {isAttemptingQuiz ? (
               <div className="flex flex-col items-center bg-white p-8 rounded-xl shadow-lg">
                 <label className="text-2xl font-bold mb-4">Enter Quiz ID</label>
@@ -51,9 +51,9 @@ export default function Home() {
                 </button>
               </div>
             ) : (
-              <div className="md:px-4 md:grid md:grid-cols-2 lg:grid-cols-2 gap-20 space-y-4 md:space-y-0">
+              <div className="md:px-4 mx-4 md:grid md:grid-cols-2 lg:grid-cols-2 gap-20 space-y-4 md:space-y-0">
                 <div
-                  className="max-w-sm bg-white p-6 rounded-xl shadow-lg transform hover:scale-105 transition duration-500"
+                  className="max-w-sm bg-white p-6 rounded-xl  shadow-lg transform hover:scale-105 transition duration-500"
                   onClick={onCreate}
                 >
                   <h2 className="text-2xl font-bold mb-4">Create Quiz</h2>
