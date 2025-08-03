@@ -30,8 +30,8 @@ const Navbar = () => {
   const onLogout=()=>{
     
   
-    deleteCookie('accessToken',{ path: '/', domain: process.env.NEXT_PUBLIC_ACCESS_DOMAIN });
-    deleteCookie('refreshToken',{ path: '/', domain: process.env.NEXT_PUBLIC_ACCESS_DOMAIN });
+    deleteCookie('accessToken');
+    deleteCookie('refreshToken');
     router.push('/');
   }
   const navigateToHome = () => {
