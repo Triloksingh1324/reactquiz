@@ -15,7 +15,33 @@ export default function SignupPage() {
     userName: "",
   });
   const [loader, setLoader] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    let newErrors = {};
+    if (!user.userName) {
+      newErrors.userName = "Username is required";
+    }
+    if (!user.email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(user.email)) {
+      newErrors.email = "Invalid email address";
+    }
+    if (!user.password) {
+      newErrors.password = "Password is required";
+    } else if (user.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
+    }
+    setErrors(newErrors);
+    return newErrors;
+  };
+
   const Signup = async () => {
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      Object.values(newErrors).forEach(error => toast.error(error));
+      return;
+    }
     setLoader(true);
     try {
       const response = await axios.post("/api/users/signup/", user);
@@ -315,10 +341,14 @@ export default function SignupPage() {
                   name="username"
                   value={user.userName}
                   className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-                  onChange={(e)=>setUser({...user,userName:e.target.value})}
+                  onChange={(e)=>{
+                    setUser({...user,userName:e.target.value});
+                    setErrors({...errors, userName: ''});
+                  }}
                 placeholder="Username"
                 required
                 />
+                {errors.userName && <p className="text-red-500 text-sm mt-1">{errors.userName}</p>}
               </div>
               <div>
                 <label
@@ -334,9 +364,13 @@ export default function SignupPage() {
                   className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
                   value={user.email}
                 placeholder="your@email.com"
-                onChange={(e)=>setUser({...user,email: e.target.value})}
+                onChange={(e)=>{
+                  setUser({...user,email: e.target.value});
+                  setErrors({...errors, email: ''});
+                }}
                 required
                 />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
               <div>
                 <label
@@ -351,10 +385,14 @@ export default function SignupPage() {
                   name="password"
                   className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
                   value={user.password}
-                onChange={(e)=>setUser({...user, password: e.target.value})}
+                onChange={(e)=>{
+                  setUser({...user, password: e.target.value});
+                  setErrors({...errors, password: ''});
+                }}
                 placeholder="Enter your password"
                 required
                 />
+                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
               </div>
               <div>
               {loader ? (

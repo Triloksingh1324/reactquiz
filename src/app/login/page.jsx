@@ -18,6 +18,19 @@ export default function LoginPage() {
   });
   const [loader, setLoader] = useState(false);
   const onLogin = async () => {
+    
+    if (!user.email || !user.password) {
+      toast.error("Please fill in both email and password.");
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(user.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    
     setLoader(true);
     try {
       const response = await axios.post("/api/users/login", user);
@@ -48,9 +61,21 @@ export default function LoginPage() {
     }
   };
   const onForgot = async () => {
+   
+    if (!user.email) {
+      toast.error("Please enter your email address to reset your password.");
+      return;
+    }
+
+    // Email format validation for forgot password
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(user.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
     try {
       const response = await axios.post("api/users/forgot", user);
-      alert("An email has been sent to your email for resetting your password");
+      toast.success("An email has been sent to your email for resetting your password");
     } catch (error) {
       console.log(error.message);
     }
